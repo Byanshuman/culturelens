@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CultureLens – Anonymous Comments</title>
+
+<style>
+
+body{
+  margin:0;
+  font-family:Segoe UI, Poppins, Arial;
+  background:#020617;
+  color:white;
+}
+
+nav{
+  padding:18px 40px;
+  font-size:24px;
+  font-weight:800;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.container{
+  max-width:1100px;
+  margin:auto;
+  padding:18px;
+}
+
+.card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:16px;
+  backdrop-filter:blur(10px);
+  box-shadow:0 0 32px rgba(0,0,0,.25);
+}
+
+input,textarea{
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  color:white;
+  margin-top:6px;
+}
+
+textarea{resize:none;}
+
+button{
+  padding:10px 18px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.primary{background:#38bdf8;color:black;}
+.primary:hover{background:#0ea5e9;}
+
+.secondary{
+  background:transparent;
+  border:1px solid #38bdf8;
+  color:#38bdf8;
+}
+
+.danger{background:#ef4444;color:white;}
+.danger:hover{background:#dc2626;}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:8px;
+}
+
+th,td{
+  padding:10px;
+  border:1px solid rgba(255,255,255,.25);
+}
+
+th{
+  background:rgba(255,255,255,.15);
+}
+
+.success{color:#a7f3d0;}
+.error{color:#fca5a5;}
+
+</style>
+</head>
+
+<body>
+
+<nav>🗨️ CultureLens – Anonymous Comments</nav>
+
+<div class="container">
+
+<!-- ADD COMMENT -->
+<div class="card">
+  <h2>Add Anonymous Comment</h2>
+
+  <label>Company (optional)</label>
+  <input id="company" placeholder="Example: Infosys, TCS">
+
+  <label>Comment *</label>
+  <textarea id="comment" rows="3" placeholder="Write your experience here..."></textarea>
+
+  <br>
+
+  <button class="primary" onclick="addComment()">Add Comment</button>
+
+  <p id="msg" class="success"></p>
+  <p id="err" class="error"></p>
+</div>
+
+<!-- COMMENTS TABLE -->
+<div class="card">
+
+  <h2>Stored Comments</h2>
+
+  <input id="search" placeholder="Search company / comment..." onkeyup="renderTable()">
+
+  <br><br>
+
+  <button class="secondary" onclick="exportExcel()">Export to Excel</button>
+  <button class="danger" onclick="clearAll()">Clear All</button>
+
+  <table id="tableData">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Company</th>
+        <th>Comment</th>
+        <th>Date & Time</th>
+        <th>Delete</th>
+      </tr>
+    </thead>
+
+    <tbody id="tableBody"></tbody>
+  </table>
+
+</div>
+
+</div>
+
+<script>
+
+/* ==========================
+   DATA STORAGE
+========================== */
+let comments = JSON.parse(localStorage.getItem("commentsTable") || "[]");
+
+/* ==========================
+   SECURE FIXED PIN
+   PIN = 20081988
+========================== */
+
+/* Correct SHA-256 hash of 20081988 */
+const ADMIN_PIN_HASH =
+"f6370f8f7c28a725bc798fca212b86f97ced341b01f1d8638fb409d5839a2d76";
+
+/* Hash function */
+async function sha256(message){
+  const msgBuffer = new TextEncoder().encode(message);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2,"0")).join("");
+}
+
+/* ==========================
+   ADD COMMENT
+========================== */
+function addComment(){
+
+  const comp = company.value.trim();
+  const comm = comment.value.trim();
+
+  msg.innerText = "";
+  err.innerText = "";
+
+  if(comm === ""){
+    err.innerText = "Comment cannot be empty.";
+    return;
+  }
+
+  comments.push({
+    company: comp || "Not specified",
+    comment: comm,
+    time: new Date().toLocaleString()
+  });
+
+  localStorage.setItem("commentsTable", JSON.stringify(comments));
+
+  msg.innerText = "Comment added ✔️";
+
+  company.value = "";
+  comment.value = "";
+
+  renderTable();
+}
+
+/* ==========================
+   DELETE SINGLE COMMENT
+========================== */
+async function deleteComment(index){
+
+  let pin = prompt("Enter Admin PIN to delete:");
+
+  if(!pin) return;
+
+  const hash = await sha256(pin);
+
+  if(hash !== ADMIN_PIN_HASH){
+    alert("Wrong PIN. Action cancelled.");
+    return;
+  }
+
+  comments.splice(index,1);
+  localStorage.setItem("commentsTable", JSON.stringify(comments));
+  renderTable();
+}
+
+/* ==========================
+   CLEAR ALL COMMENTS
+========================== */
+async function clearAll(){
+
+  let pin = prompt("Enter Admin PIN to CLEAR ALL comments:");
+
+  if(!pin) return;
+
+  const hash = await sha256(pin);
+
+  if(hash !== ADMIN_PIN_HASH){
+    alert("Wrong PIN. Action cancelled.");
+    return;
+  }
+
+  if(confirm("This will delete ALL comments. Continue?")){
+    comments = [];
+    localStorage.setItem("commentsTable","[]");
+    renderTable();
+  }
+}
+
+/* ==========================
+   RENDER TABLE
+========================== */
+function renderTable(){
+
+  const body = document.getElementById("tableBody");
+  const term = search.value.toLowerCase();
+
+  body.innerHTML = "";
+
+  comments
+    .filter(c =>
+      c.company.toLowerCase().includes(term) ||
+      c.comment.toLowerCase().includes(term)
+    )
+    .forEach((c,i)=>{
+      body.innerHTML += `
+        <tr>
+          <td>${i+1}</td>
+          <td>${c.company}</td>
+          <td>${c.comment}</td>
+          <td>${c.time}</td>
+          <td><button class="danger" onclick="deleteComment(${i})">Delete</button></td>
+        </tr>
+      `;
+    });
+}
+
+renderTable();
+
+/* ==========================
+   EXPORT TO EXCEL
+========================== */
+function exportExcel(){
+
+  const table = document.getElementById("tableData").outerHTML;
+  const blob = new Blob([table], {type:"application/vnd.ms-excel"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "CultureLens_Comments.xls";
+  a.click();
+}
+
+</script>
+
+</body>
+</html>

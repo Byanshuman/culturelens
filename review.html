@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>CultureLens – Write a Review</title>
+
+<style>
+
+body{
+  margin:0;
+  font-family:Segoe UI, Poppins, Arial;
+  background:linear-gradient(140deg,#020617,#020b25,#0f172a);
+  color:white;
+}
+
+nav{
+  padding:18px 40px;
+  font-size:24px;
+  font-weight:800;
+  border-bottom:1px solid rgba(255,255,255,.15);
+}
+
+.wrapper{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
+}
+
+.card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:22px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 40px rgba(0,0,0,.35);
+}
+
+/* inputs */
+input,textarea,select{
+  width:100%;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  color:white;
+  margin-top:6px;
+}
+
+textarea{resize:none;}
+
+input::placeholder,textarea::placeholder{color:#cbd5e1;}
+
+/* stars */
+.star{
+  font-size:28px;
+  cursor:pointer;
+  color:#475569;
+}
+.star.active{
+  color:#facc15;
+  text-shadow:0 0 8px rgba(250,204,21,.6);
+}
+
+/* buttons */
+button{
+  padding:12px 22px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:700;
+}
+
+.primary{background:#38bdf8;color:black;}
+.primary:hover{background:#0ea5e9;}
+
+.secondary{
+  background:transparent;
+  border:1px solid #38bdf8;
+  color:#38bdf8;
+}
+
+.success{color:#a7f3d0;}
+.error{color:#fca5a5;}
+
+</style>
+</head>
+
+<body>
+
+<nav>✍️ CultureLens – Write a Review</nav>
+
+<div class="wrapper">
+
+<div class="card">
+
+  <h2>Share Your Experience</h2>
+
+  <label>Company Name *</label>
+  <input id="company" placeholder="Example: Infosys, TCS, Google">
+
+  <label>Your Role (optional)</label>
+  <input id="role" placeholder="Example: Software Engineer">
+
+  <label>Toxicity Rating *</label><br>
+
+  <span class="star" onclick="rate(1)">★</span>
+  <span class="star" onclick="rate(2)">★</span>
+  <span class="star" onclick="rate(3)">★</span>
+  <span class="star" onclick="rate(4)">★</span>
+  <span class="star" onclick="rate(5)">★</span>
+
+  <input type="hidden" id="rating">
+
+  <label>Your Review *</label>
+  <textarea id="text" rows="4" placeholder="Describe your work culture experience..."></textarea>
+
+  <label>
+    <input type="checkbox" id="anon"> Post as Anonymous
+  </label>
+
+  <br><br>
+
+  <button class="primary" onclick="submitReview()">Submit Review</button>
+
+  <!-- link to responses page -->
+  <button class="secondary" onclick="window.location.href='responses.html'">
+    View All Responses
+  </button>
+
+  <p id="msg" class="success"></p>
+  <p id="err" class="error"></p>
+
+</div>
+
+</div>
+
+<script>
+
+/* star rating function */
+function rate(n){
+  document.getElementById("rating").value = n;
+  document.querySelectorAll(".star").forEach((s,i)=>{
+    if(i<n) s.classList.add("active");
+    else s.classList.remove("active");
+  });
+}
+
+/* submit review */
+function submitReview(){
+
+  let company = document.getElementById("company").value.trim();
+  let role = document.getElementById("role").value.trim();
+  let rating = Number(document.getElementById("rating").value);
+  let text = document.getElementById("text").value.trim();
+  let anon = document.getElementById("anon").checked;
+
+  let err = document.getElementById("err");
+  let msg = document.getElementById("msg");
+
+  err.innerText="";
+  msg.innerText="";
+
+  if(company==="" || text===""){
+    err.innerText="Company name and review are required.";
+    return;
+  }
+
+  if(!rating){
+    err.innerText="Please select star rating.";
+    return;
+  }
+
+  let user = anon ? "Anonymous" : (role || "Employee");
+
+  /* get existing reviews */
+  let reviews = JSON.parse(localStorage.getItem("reviews") || "[]");
+
+  /* push new review */
+  reviews.push({
+    company:company,
+    rating:rating,
+    text:text,
+    user:user,
+    time:new Date().toLocaleString()
+  });
+
+  /* save back */
+  localStorage.setItem("reviews", JSON.stringify(reviews));
+
+  msg.innerText="Review submitted successfully ✔️";
+
+  /* clear form */
+  document.getElementById("company").value="";
+  document.getElementById("role").value="";
+  document.getElementById("text").value="";
+  document.getElementById("rating").value="";
+  document.querySelectorAll(".star").forEach(s=>s.classList.remove("active"));
+}
+
+</script>
+
+</body>
+</html>

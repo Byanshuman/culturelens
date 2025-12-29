@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Home – Workplace Toxicity Index</title>
+
+<style>
+
+*{box-sizing:border-box;}
+
+body{
+  margin:0;
+  font-family:Segoe UI, Poppins, Arial;
+  background:linear-gradient(140deg,#020617,#020b25,#0f172a);
+  color:white;
+}
+
+/* NAVBAR */
+nav{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:18px 40px;
+  background:rgba(0,0,0,.45);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid rgba(255,255,255,.12);
+}
+
+.logo{
+  font-size:24px;
+  font-weight:800;
+}
+
+nav a{
+  color:#e2e8f0;
+  text-decoration:none;
+  margin-left:18px;
+  font-size:15px;
+}
+nav a:hover{color:#38bdf8;}
+
+/* HERO */
+.hero{
+  max-width:1050px;
+  margin:auto;
+  padding:80px 20px 60px 20px;
+  text-align:center;
+}
+
+.hero h1{font-size:44px;font-weight:900;}
+.hero p{color:#cbd5e1;font-size:17px;}
+
+/* BUTTONS */
+button{
+  padding:12px 22px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:600;
+  font-size:15px;
+}
+.primary{background:#38bdf8;color:black;margin-right:8px;}
+.primary:hover{background:#0ea5e9;}
+.secondary{
+  background:transparent;
+  border:1px solid #38bdf8;
+  color:#38bdf8;
+}
+.secondary:hover{background:#0ea5e9;color:black;}
+
+/* Features */
+.section{
+  max-width:1100px;
+  margin:40px auto;
+  padding:10px 20px;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:16px;
+}
+.card{
+  background:rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:18px;
+  padding:18px;
+  backdrop-filter:blur(14px);
+  box-shadow:0 20px 40px rgba(0,0,0,.25);
+  cursor:pointer;
+}
+
+/* FOOTER */
+footer{
+  text-align:center;
+  color:#94a3b8;
+  padding:20px;
+  border-top:1px solid rgba(255,255,255,.12);
+  margin-top:40px;
+}
+
+/* POPUP modal for anonymous review FROM HOME CARD */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  backdrop-filter:blur(6px);
+  z-index:999;
+}
+.modal-content{
+  max-width:520px;
+  margin:80px auto;
+  background:#0f172a;
+  padding:22px;
+  border-radius:18px;
+  border:1px solid rgba(255,255,255,.2);
+}
+.close{float:right;font-size:26px;cursor:pointer;}
+.modal-content input,.modal-content textarea{
+  width:100%;
+  padding:10px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  color:white;
+  margin-top:6px;
+}
+.success{color:#a7f3d0;}
+.error{color:#fca5a5;}
+
+</style>
+</head>
+
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">Workplace Toxicity Index</div>
+
+  <div>
+    <a href="home.html">Home</a>
+    <a href="companies.html">Companies</a>
+    <a href="review.html">Write Review</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <h1>Real Stories. Real Ratings. Real Work Culture.</h1>
+  <p>Discover which companies respect employees — and which ones are toxic.</p>
+
+  <button class="primary" onclick="window.location.href='review.html'">Start Reviewing</button>
+  <button class="secondary" onclick="window.location.href='companies.html'">View Company Rankings</button>
+</div>
+
+<!-- FEATURES SECTION -->
+<div class="section">
+  <h2 style="text-align:center;">What You Can Do Here</h2>
+
+  <div class="grid">
+
+    <!-- opens popup -->
+    <div class="card" id="openCommentPopup">
+      <h3>✍️ Write Anonymous Reviews</h3>
+      Share your workplace experience safely.
+    </div>
+
+    <div class="card" onclick="window.location.href='companies.html'">
+      <h3>📊 Rank Companies</h3>
+      See toxicity ratings based on real reviews.
+    </div>
+
+    <div class="card" onclick="window.location.href='companies.html'">
+      <h3>🔍 Search Companies</h3>
+      Quickly find the company you're interested in.
+    </div>
+
+    <div class="card">
+      <h3>🛡 No Identity Required</h3>
+      We value privacy and mental health.
+    </div>
+
+  </div>
+</div>
+
+<!-- 🔐 ADMIN SECTION -->
+<div class="section">
+  <h2 style="text-align:center;">Admin Access (Password Protected)</h2>
+
+  <div class="grid">
+
+    <div class="card" onclick="openProtected('comments.html')">
+      <h3>🔒 View Anonymous Comments Table</h3>
+      Admin-only access.
+    </div>
+
+    <div class="card" onclick="openProtected('responses.html')">
+      <h3>🔒 View Review Responses Table</h3>
+      Admin-only access.
+    </div>
+
+  </div>
+</div>
+
+<!-- CTA -->
+<div class="hero">
+  <h1>Your voice matters.</h1>
+  <p>Help others avoid toxic workplaces.</p>
+</div>
+
+<!-- POPUP FORM -->
+<div id="commentModal" class="modal">
+  <div class="modal-content">
+
+    <span class="close">&times;</span>
+
+    <h2>Anonymous Review</h2>
+
+    <label>Company (optional)</label>
+    <input id="mCompany" placeholder="Example: Infosys, TCS">
+
+    <label>Your Comment *</label>
+    <textarea id="mComment" rows="3" placeholder="Write your experience..."></textarea>
+
+    <br>
+
+    <button class="primary" onclick="saveHomeComment()">Submit</button>
+
+    <p id="mMsg" class="success"></p>
+    <p id="mErr" class="error"></p>
+
+  </div>
+</div>
+
+<footer>
+  © 2025 Workplace Toxicity Index — Speak Truth. Stay Safe.
+</footer>
+
+<script>
+/* ========== POPUP open/close ========== */
+document.getElementById("openCommentPopup").onclick=()=>commentModal.style.display="block";
+document.querySelector(".close").onclick=()=>commentModal.style.display="none";
+window.onclick=e=>{if(e.target==commentModal)commentModal.style.display="none";};
+
+/* ========== SAVE ANONYMOUS COMMENT ========== */
+function saveHomeComment(){
+  let comp=mCompany.value.trim();
+  let comm=mComment.value.trim();
+  mMsg.innerText="";mErr.innerText="";
+  if(comm===""){mErr.innerText="Comment cannot be empty.";return;}
+
+  let comments=JSON.parse(localStorage.getItem("commentsTable")||"[]");
+  comments.push({company:comp||"Not specified",comment:comm,time:new Date().toLocaleString()});
+  localStorage.setItem("commentsTable",JSON.stringify(comments));
+
+  mMsg.innerText="Comment submitted anonymously ✔️";
+  mCompany.value="";mComment.value="";
+}
+
+/* ========== ADMIN PASSWORD PROTECTION ========== */
+/* SHA-256 of 20081988 */
+const ADMIN_HASH="f6370f8f7c28a725bc798fca212b86f97ced341b01f1d8638fb409d5839a2d76";
+
+async function sha256(msg){
+  const buf=new TextEncoder().encode(msg);
+  const hash=await crypto.subtle.digest("SHA-256",buf);
+  return Array.from(new Uint8Array(hash)).map(b=>b.toString(16).padStart(2,"0")).join("");
+}
+
+async function openProtected(page){
+  let pin=prompt("Enter Admin Password:");
+  if(!pin)return;
+
+  const hash=await sha256(pin);
+  if(hash!==ADMIN_HASH){alert("❌ Wrong password");return;}
+
+  window.location.href=page;
+}
+
+</script>
+
+</body>
+</html>
