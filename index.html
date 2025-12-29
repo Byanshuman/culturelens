@@ -10,10 +10,17 @@
 
 body{
   margin:0;
-  font-family:Segue UI, Poppins, Arial;
-  background:linear-gradient(140deg,#020617,#020b25,#0f172a);
+  font-family:Segoe UI, Poppins, Arial;
+
+  /* smooth continuous gradient */
+  background:linear-gradient(180deg, #020617 0%, #040b29 50%, #020617 100%);
+  
+  /* remove banding issues */
+  background-attachment: fixed;
+
   color:white;
 }
+
 
 /* APP TITLE */
 .topbar{
@@ -184,3 +191,4 @@ function setMood(m){
 
 </body>
 </html>
+
